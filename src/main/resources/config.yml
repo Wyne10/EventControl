@@ -1,0 +1,7 @@
+regenerate: true
+lang: 'ru.yml'
+usePlayerLanguage: true
+# LEGACY/ENHANCED_LEGACY/MINI_MESSAGE
+serializer: MINI_MESSAGE
+# OFF/FATAL/ERROR/WARN/INFO/DEBUG/TRACE/ALL
+logLevel: INFO
