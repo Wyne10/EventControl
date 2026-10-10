@@ -4,7 +4,6 @@ import me.wyne.eventcontrol.api.event.EventType;
 import me.wyne.eventcontrol.api.queue.QueueSource;
 import me.wyne.eventcontrol.api.spi.FactoryRegistry;
 import me.wyne.eventcontrol.api.spi.InstanceRegistry;
-import me.wyne.eventcontrol.api.text.EventPlaceholders;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,8 +27,6 @@ public interface EventControlRegistries {
     /** Ways of deciding what a queue runs next. One object per configured queue. */
     @NotNull FactoryRegistry<QueueSource> queueSources();
 
-    /** Adds placeholders to every event message and screen. */
-    void registerEventPlaceholders(@NotNull EventPlaceholders placeholders);
-
+    /** Whether registrations are still accepted. */
     boolean isOpen();
 }

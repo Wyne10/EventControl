@@ -12,9 +12,6 @@ format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gra
 info-no-queues: "<gray>▶ <white>Сейчас нет активных очередей событий"
 info-event-active: "<gold>▶ <white>Сейчас идёт <gold><event> <white>— до конца <gold>%dtf_duration_<ends-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
 info-event-upcoming: "<gray>▶ <white>Далее <gold><event> <white>— через <gold>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
-info-event-starting-soon: "<gold>▶ <white><event-name> <white>начнётся через <gold>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
-info-event-started: "<gold>▶ <white><event-name> <white>началось на координатах <gold><position><white>! До конца <gold>%dtf_duration_<ends-in>ms_mm' мин. 'ss' сек.'%"
-info-event-ended: "<gray>▶ <white><event-name> <white>завершилось"
 info-no-poll: "<gray>▶ <white>Сейчас нет открытых голосований"
 info-poll-opened: "<gold>▶ <white>Голосование за следующее событие в очереди <gold><queue><white>! До конца <gold>%dtf_duration_<closes-in>ms_mm' мин. 'ss' сек.'%"
 info-poll-closed: "<gold>▶ <white>Голосование завершено: <gold><event> <white>(<gold><votes><white> из <gold><total><white> голосов)"
@@ -39,5 +36,8 @@ success-poll-closed: "<green>▶ <white>Голосование в очереди
 
 ### Events
 
+# Ключ `display:` из файла события ищется здесь. Событие, зарегистрированное
+# другим плагином, тоже называется здесь: файл определения принадлежит этому
+# плагину, значит и ключ в нём тоже.
 event-demo: "<aqua>Демонстрационное событие"
 event-demo-wide: "<aqua>Демонстрационное событие (широкий поиск)"

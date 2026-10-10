@@ -16,8 +16,9 @@ public interface EventDefinition {
     @NotNull EventType getType();
 
     /**
-     * The i18n key of this event's display name. Resolved against the language
-     * files of whichever plugin owns the key, so a provider ships its own wording.
+     * The i18n key of this event's display name, resolved against EventControl's
+     * own language files. The definition file is EventControl's, so the key in
+     * it points into EventControl's {@code lang/}, not the owning plugin's.
      */
     @NotNull String getDisplayKey();
 

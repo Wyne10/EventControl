@@ -23,14 +23,18 @@ public interface EventContext {
      */
     <T extends AutoCloseable> @NotNull T bind(@NotNull T closeable);
 
-    /** Players currently counted as taking part, for {@code audience: participants}. */
+    /**
+     * Players currently counted as taking part. EventControl only keeps the
+     * set; what it means and who goes in it is the owning plugin's call.
+     */
     @NotNull Collection<Player> getParticipants();
 
     void addParticipant(@NotNull Player player);
 
     /**
      * Ends the event now rather than waiting out its duration. The engine runs
-     * the normal end path: announcements, teardown, and the next slot.
+     * the normal end path: {@link ActiveEvent#onEnd()}, teardown of everything
+     * bound here, and the next slot.
      */
     void endNow();
 }

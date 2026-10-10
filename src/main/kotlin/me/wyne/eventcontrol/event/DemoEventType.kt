@@ -12,7 +12,6 @@ import me.wyne.eventcontrol.api.spi.AbstractActiveEvent
 import me.wyne.eventcontrol.api.spi.AbstractEventType
 import me.wyne.eventcontrol.api.spi.AbstractPreparedEvent
 import me.wyne.eventcontrol.api.spi.SimpleEventDefinition
-import me.wyne.eventcontrol.api.text.PlaceholderSink
 import me.wyne.eventcontrol.registry.Registries
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
@@ -22,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom
  * The event type that ships in the jar: it resolves a location, and nothing
  * else. It exists so a fresh install has something to run, and because it is a
  * worked example of the one contract that matters — every fact is settled in
- * `prepareBlocking`, so it can be announced and shown before the event starts.
+ * `prepareBlocking`, so it can be read and shown before the event starts.
  *
  * It registers through the same registry a third-party plugin uses.
  */
@@ -69,11 +68,6 @@ private class DemoPreparedEvent(
 ) : AbstractPreparedEvent(demo, startAt) {
 
     override fun getLocation(): Location = location
-
-    /** Values only this event knows, added to the same sink as the generic ones. */
-    override fun contributePlaceholders(sink: PlaceholderSink) {
-        sink.text("radius", demo.radius.toString())
-    }
 
     override fun onStart(context: EventContext): ActiveEvent = DemoActiveEvent(this, context)
 

@@ -24,9 +24,6 @@ class QueueSlotImpl(
     private var prepared: PreparedEvent? = null
     private var active: ActiveEvent? = null
 
-    /** Announcement keys already sent, so a repeating tick never sends twice. */
-    val sentAnnouncements = mutableSetOf<String>()
-
     /** Set while preparation is in flight; polled by the type through its context. */
     var cancelled = false
         private set

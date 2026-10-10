@@ -12,9 +12,6 @@ format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gra
 info-no-queues: "<gray>▶ <white>No event queues are running right now"
 info-event-active: "<gold>▶ <white>Running now: <gold><event> <white>— ends in <gold>%dtf_duration_<ends-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
 info-event-upcoming: "<gray>▶ <white>Next: <gold><event> <white>— in <gold>%dtf_duration_<starts-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
-info-event-starting-soon: "<gold>▶ <white><event-name> <white>starts in <gold>%dtf_duration_<starts-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
-info-event-started: "<gold>▶ <white><event-name> <white>has started at <gold><position><white>! Ends in <gold>%dtf_duration_<ends-in>ms_mm'm 'ss's'%"
-info-event-ended: "<gray>▶ <white><event-name> <white>has ended"
 info-no-poll: "<gray>▶ <white>No vote is open right now"
 info-poll-opened: "<gold>▶ <white>Vote for the next event in queue <gold><queue><white>! Closes in <gold>%dtf_duration_<closes-in>ms_mm'm 'ss's'%"
 info-poll-closed: "<gold>▶ <white>Vote finished: <gold><event> <white>(<gold><votes><white> of <gold><total><white> votes)"
@@ -39,5 +36,8 @@ success-poll-closed: "<green>▶ <white>Vote in queue <green><queue> <white>fini
 
 ### Events
 
+# A `display:` key from an event definition resolves here. An event type shipped
+# by another plugin puts its name here too — the definition file is this
+# plugin's, so the key it names is this plugin's.
 event-demo: "<aqua>Demo event"
 event-demo-wide: "<aqua>Demo event (wide search)"

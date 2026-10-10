@@ -47,6 +47,7 @@ tasks {
             relocate("net.kyori", "me.wyne.eventcontrol.shadow.net.kyori")
             relocate("dev.vankka", "me.wyne.eventcontrol.shadow.dev.vankka")
             relocate("me.wyne.wutils", "me.wyne.eventcontrol.shadow.wutils")
+            relocate("kotlin", "me.wyne.eventcontrol.shadow.kotlin")
         }
     }
 

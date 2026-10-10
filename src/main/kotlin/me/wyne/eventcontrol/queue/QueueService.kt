@@ -5,7 +5,6 @@ import com.google.inject.Singleton
 import me.wyne.eventcontrol.EventControl
 import me.wyne.eventcontrol.api.event.EventDefinition
 import me.wyne.eventcontrol.api.queue.QueueSource
-import me.wyne.eventcontrol.event.Announcer
 import me.wyne.eventcontrol.event.EventDefinitionProvider
 import me.wyne.eventcontrol.registry.Registries
 import me.wyne.wutils.common.loadable.Loadable
@@ -32,8 +31,7 @@ class QueueService @Inject constructor(
     private val plugin: EventControl,
     private val registries: Registries,
     private val definitions: EventDefinitionProvider,
-    private val queues: QueueProvider,
-    private val announcer: Announcer
+    private val queues: QueueProvider
 ) : Loadable, Terminable {
 
     /** Resumable timelines, keyed by queue, written on disable and on reload. */
@@ -82,7 +80,7 @@ class QueueService @Inject constructor(
                 "registered sources: ${registries.queueSources().keys()}"
         }
         val source: QueueSource = factory.create(definition.sourceKey, definition.sourceConfig)
-        val queue = EventQueue(definition, source, { candidatesOf(definition) }, announcer)
+        val queue = EventQueue(definition, source) { candidatesOf(definition) }
         live[definition.key] = queue
     }
 

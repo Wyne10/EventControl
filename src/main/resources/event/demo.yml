@@ -2,7 +2,7 @@
 # keys are read from this same section.
 type: demo
 
-# The name key, looked up in the language files of whichever plugin owns the event.
+# The name key, looked up in EventControl's own language files.
 display: event-demo
 
 duration: 10m

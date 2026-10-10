@@ -22,7 +22,6 @@ data class QueueDefinition(
     val sourceKey: String,
     val sourceConfig: ConfigurationSection,
     val eventKeys: List<String>,
-    val announcements: List<Announcement>,
     val autoStart: Boolean,
     val resumeInterrupted: Boolean
 ) {
@@ -30,12 +29,6 @@ data class QueueDefinition(
     /** Null until the world is loaded, which on a fresh start is not immediate. */
     val world: World?
         get() = Bukkit.getWorld(worldName)
-
-    val startAnnouncements: List<Announcement> =
-        announcements.filter { it.trigger == Announcement.Trigger.START }
-
-    val endAnnouncements: List<Announcement> =
-        announcements.filter { it.trigger == Announcement.Trigger.END }
 
     object Factory : GenericFactory<QueueDefinition> {
 
@@ -62,7 +55,6 @@ data class QueueDefinition(
                 sourceKey = section.getString("source", "weighted-random")!!,
                 sourceConfig = section,
                 eventKeys = events,
-                announcements = Announcement.readAll(section, "announce"),
                 autoStart = section.getBoolean("auto-start", true),
                 resumeInterrupted = section.getBoolean("resume-interrupted", false)
             )

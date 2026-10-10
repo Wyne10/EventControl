@@ -9,6 +9,7 @@ import me.wyne.eventcontrol.api.queue.QueueView
 import me.wyne.eventcontrol.api.queue.SlotState
 import me.wyne.eventcontrol.queue.QueueService
 import me.wyne.wutils.common.Args
+import me.wyne.wutils.i18n.kotlin.placeholderComponent
 import org.bukkit.OfflinePlayer
 import java.time.Duration
 import java.time.Instant
@@ -25,6 +26,11 @@ import java.time.Instant
  * Durations are raw milliseconds. Formatting belongs to the DateTimeFormat
  * expansion, which the server owner points at these values:
  * `%dtf_duration_{eventcontrol_main_next_starts-in}ms_mm'm 'ss's'%`.
+ *
+ * `display` is the one field that comes out of a language file rather than the
+ * timeline, so it carries i18n's serializer suffixes — `display-legacy`,
+ * `display-mm`, `display-plain` and the rest. Whoever reads the placeholder
+ * picks the markup; this expansion does not choose one for them.
  */
 @Singleton
 class QueuePlaceholders @Inject constructor(private val queues: QueueService) : PlaceholderExpansion() {
@@ -42,7 +48,7 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
 
     override fun persist() = true
 
-    override fun onRequest(player: OfflinePlayer?, params: String): String? {
+    override fun onRequest(viewer: OfflinePlayer?, params: String): String? {
         val args = Args(params, "_")
         if (args.size() < 2) return null
 
@@ -53,7 +59,7 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
 
         val slot = slotFor(queue, field) ?: return null
         val slotField = if (args.size() >= 3) args.get(2) else "name"
-        return slotField(slot, slotField)
+        return slotField(slot, slotField, viewer)
     }
 
     private fun queueField(queue: QueueView, field: String): String? = when (field) {
@@ -80,12 +86,21 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
 
     private fun pending(queue: QueueView) = queue.upcoming.filter { it.state != SlotState.RUNNING }
 
-    private fun slotField(slot: QueueSlot, field: String): String? {
+    private fun slotField(slot: QueueSlot, field: String, viewer: OfflinePlayer?): String? {
         val definition = slot.definition
         val prepared = slot.prepared
+
+        // The resolved name, not the key: every other field here is a value.
+        // `style` answers `display` and each of its serializer variants, and null
+        // for anything else, so a mistyped suffix stays unresolved rather than
+        // quietly rendering as the default.
+        if (field.startsWith(DISPLAY_FIELD)) {
+            val named = definition ?: return ""
+            return viewer.placeholderComponent(named.displayKey).style(DISPLAY_FIELD, field)
+        }
+
         return when (field) {
             "name", "key" -> definition?.key ?: ""
-            "display" -> definition?.displayKey ?: ""
             "state" -> slot.state.name.lowercase()
             "origin" -> slot.origin.name.lowercase()
             "requester" -> slot.requester ?: ""
@@ -106,6 +121,9 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
         Duration.between(Instant.now(), target).toMillis().coerceAtLeast(0L).toString()
 
     companion object {
+        /** i18n appends its serializer suffixes to this, so it is matched as a prefix. */
+        private const val DISPLAY_FIELD = "display"
+
         lateinit var instance: QueuePlaceholders
             private set
     }

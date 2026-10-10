@@ -4,9 +4,7 @@ import me.wyne.eventcontrol.EventControl
 import me.wyne.eventcontrol.api.event.EventContext
 import me.wyne.eventcontrol.api.queue.QueueSlot
 import me.wyne.eventcontrol.api.queue.QueueView
-import me.wyne.eventcontrol.api.text.AudienceContext
 import org.bukkit.Location
-import org.bukkit.World
 import org.bukkit.entity.Player
 import java.util.UUID
 
@@ -20,7 +18,7 @@ class EventContextImpl(
     private val slot: QueueSlot,
     private val location: Location?,
     private val endNow: () -> Unit
-) : EventContext, AudienceContext, AutoCloseable {
+) : EventContext, AutoCloseable {
 
     private val bound = mutableListOf<AutoCloseable>()
     private val participantIds = linkedSetOf<UUID>()
@@ -43,14 +41,12 @@ class EventContextImpl(
 
     override fun endNow() = endNow.invoke()
 
-    override fun getWorld(): World = queue.world
-
-    override fun getLocation(): Location? = location
-
-    /** Closes in reverse order, so teardown undoes setup. */
+    /**
+     * Closes in reverse order, so teardown undoes setup.
+     */
     override fun close() {
-        bound.asReversed().forEach { closeable ->
-            runCatching { closeable.close() }
+        for (index in bound.indices.reversed()) {
+            runCatching { bound[index].close() }
                 .onFailure { EventControl.logger.error("Failed closing a resource bound to an event", it) }
         }
         bound.clear()

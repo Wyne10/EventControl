@@ -9,7 +9,6 @@ import me.wyne.eventcontrol.api.queue.QueueSource
 import me.wyne.eventcontrol.api.spi.ConfigFactory
 import me.wyne.eventcontrol.api.spi.FactoryRegistry
 import me.wyne.eventcontrol.api.spi.InstanceRegistry
-import me.wyne.eventcontrol.api.text.EventPlaceholders
 
 @Singleton
 class Registries @Inject constructor() : EventControlRegistries {
@@ -18,26 +17,12 @@ class Registries @Inject constructor() : EventControlRegistries {
 
     private val eventTypes = KeyedInstanceRegistry("event type", EventType::getKey) { open }
     private val queueSources = KeyedFactoryRegistry<QueueSource>("queue source") { open }
-    private val placeholders = mutableListOf<EventPlaceholders>()
 
     override fun eventTypes(): InstanceRegistry<EventType> = eventTypes
 
     override fun queueSources(): FactoryRegistry<QueueSource> = queueSources
 
-    override fun registerEventPlaceholders(placeholders: EventPlaceholders) {
-        if (!open) {
-            EventControl.logger.warn(
-                "Placeholder contributor registered after the registries closed, ignoring it"
-            )
-            return
-        }
-        this.placeholders.add(placeholders)
-    }
-
     override fun isOpen(): Boolean = open
-
-    val placeholderContributors: List<EventPlaceholders>
-        get() = placeholders.toList()
 
     fun close() {
         if (!open) return
