@@ -7,6 +7,7 @@ import me.wyne.eventcontrol.EventControl
 import me.wyne.eventcontrol.api.queue.QueueSlot
 import me.wyne.eventcontrol.api.queue.QueueView
 import me.wyne.eventcontrol.api.queue.SlotState
+import me.wyne.eventcontrol.event.EventDefinitionProvider
 import me.wyne.eventcontrol.queue.QueueService
 import me.wyne.wutils.common.Args
 import me.wyne.wutils.i18n.kotlin.placeholderComponent
@@ -16,7 +17,8 @@ import java.time.Instant
 
 /**
  * `%eventcontrol_<queue>_<field>%`, plus `%eventcontrol_<queue>_next<n>_<field>%`
- * for a slot further down the timeline.
+ * for a slot further down the timeline, and `%eventcontrol_<event>%` for one
+ * event's display name without going through a queue at all.
  *
  * Every value is read from the in-memory timeline, never from disk, because
  * placeholders resolve on the main thread once per player per frame. The
@@ -27,13 +29,18 @@ import java.time.Instant
  * expansion, which the server owner points at these values:
  * `%dtf_duration_{eventcontrol_main_next_starts-in}ms_mm'm 'ss's'%`.
  *
- * `display` is the one field that comes out of a language file rather than the
- * timeline, so it carries i18n's serializer suffixes — `display-legacy`,
- * `display-mm`, `display-plain` and the rest. Whoever reads the placeholder
- * picks the markup; this expansion does not choose one for them.
+ * A display name is the one value that comes out of a language file rather than
+ * the timeline, so it carries i18n's serializer variants and whoever reads the
+ * placeholder picks the markup. On a slot they are suffixes of the field —
+ * `display-legacy`, `display-mm`, `display-plain` — and on an event key they are
+ * a trailing argument, `%eventcontrol_<event>_legacy%`, because an event key may
+ * itself contain a hyphen and `demo-legacy` would otherwise be ambiguous.
  */
 @Singleton
-class QueuePlaceholders @Inject constructor(private val queues: QueueService) : PlaceholderExpansion() {
+class QueuePlaceholders @Inject constructor(
+    private val queues: QueueService,
+    private val definitions: EventDefinitionProvider
+) : PlaceholderExpansion() {
 
     init {
         register()
@@ -50,9 +57,12 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
 
     override fun onRequest(viewer: OfflinePlayer?, params: String): String? {
         val args = Args(params, "_")
-        if (args.size() < 2) return null
+        if (args.size() < 1) return null
 
-        val queue = queues[args.get(0)] ?: return null
+        // A queue key wins, so an event sharing a name with a queue is not
+        // reachable this way. QueueService warns about that at load.
+        val queue = queues[args.get(0)] ?: return eventDisplay(args, viewer)
+        if (args.size() < 2) return null
         val field = args.get(1)
 
         queueField(queue, field)?.let { return it }
@@ -60,6 +70,18 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
         val slot = slotFor(queue, field) ?: return null
         val slotField = if (args.size() >= 3) args.get(2) else "name"
         return slotField(slot, slotField, viewer)
+    }
+
+    /**
+     * `%eventcontrol_<event>%` — an event's display name, addressed by key
+     * rather than by its place in a timeline, so it resolves for an event that
+     * is not scheduled at all. An optional second argument picks the markup:
+     * `%eventcontrol_<event>_legacy%`.
+     */
+    private fun eventDisplay(args: Args, viewer: OfflinePlayer?): String? {
+        val definition = definitions[args.get(0)] ?: return null
+        val variant = if (args.size() >= 2) "$DISPLAY_FIELD-${args.get(1)}" else DISPLAY_FIELD
+        return viewer.placeholderComponent(definition.displayKey).style(DISPLAY_FIELD, variant)
     }
 
     private fun queueField(queue: QueueView, field: String): String? = when (field) {

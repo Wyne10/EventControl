@@ -9,8 +9,8 @@ format-slot-entry: " <gray><index>. <white><event> <gray><state>/<origin> <gray>
 ## Info
 
 info-no-queues: "<gray>▶ <white>No event queues are running right now"
-info-event-active: "<gold>▶ <white>Running now: <gold><event> <white>— ends in <gold>%dtf_duration_<ends-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
-info-event-upcoming: "<gray>▶ <white>Next: <gold><event> <white>— in <gold>%dtf_duration_<starts-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
+info-event-active: "<gold>▶ <white>Running now: <gold>%eventcontrol_<event>%% <white>— ends in <gold>%dtf_duration_<ends-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
+info-event-upcoming: "<gray>▶ <white>Next: <gold>%eventcontrol_<event>% <white>— in <gold>%dtf_duration_<starts-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
 
 ## Error
 
