@@ -25,10 +25,25 @@ import java.util.concurrent.Executor
  * The engine owns every scheduling state, so an event type owns none. A slot
  * being prepared, a slot waiting out its lead time and a slot running in the
  * world used to be three separate maps in every event plugin; here they are
- * three states of one list, advanced by a single tick.
+ * three states of one list.
  *
- * The invariant the tick maintains: `lookahead` slots are always planned, and
- * the head is always prepared by `startAt - prepareLead`.
+ * `slots` holds only non-terminal slots: a slot is removed the moment it
+ * finishes or is cancelled, so no loop here has to filter for that.
+ *
+ * ## Why a tick rather than scheduled transitions
+ *
+ * The tick re-derives the timeline from current state once a second, so no
+ * transition can be missed, double-fired, or left scheduled against a start
+ * time that has since moved. Every invariant — `lookahead` slots planned, the
+ * head prepared by `startAt - prepareLead`, due announcements sent, a due slot
+ * launched, an over-run slot ended — is re-established rather than carried in
+ * pending tasks.
+ *
+ * A task per transition would mean cancelling and rescheduling up to
+ * `lookahead` x announcements tasks whenever anything shifts, and reload would
+ * have to track them all. Announcements need second-level accuracy anyway, so a
+ * one-second period is no finer than the feature requires, and the work is a
+ * handful of comparisons over at most `lookahead + 1` slots with no allocation.
  */
 class EventQueue(
     val definition: QueueDefinition,
@@ -63,11 +78,12 @@ class EventQueue(
 
     override fun isRunning(): Boolean = running
 
-    override fun getUpcoming(): List<QueueSlot> = slots.filterNot { it.state.isTerminal }
+    /** A copy: callers never receive the engine's live list. */
+    override fun getUpcoming(): List<QueueSlot> = slots.toList()
 
-    override fun getActiveSlot(): QueueSlot? = slots.firstOrNull { it.state == SlotState.RUNNING }
+    override fun getActiveSlot(): QueueSlot? = runningSlot()
 
-    override fun getNextSlot(): QueueSlot? = upcoming.firstOrNull()
+    override fun getNextSlot(): QueueSlot? = slots.firstOrNull()
 
     override fun getCandidates(): List<EventDefinition> = candidates()
 
@@ -104,13 +120,12 @@ class EventQueue(
 
     /** Abandons the head slot, releasing whatever its preparation allocated. */
     fun skip(): EventDefinition? {
-        val slot = slots.firstOrNull { !it.state.isTerminal } ?: return null
+        val slot = slots.firstOrNull() ?: return null
         val skipped = slot.definition
         if (slot.state == SlotState.RUNNING) {
             endActive()
         } else {
-            slot.cancel()
-            prune()
+            discard(slot)
             val now = Instant.now()
             nextAvailable = now.plus(definition.prepareLead)
             rescheduleFrom(now)
@@ -133,14 +148,13 @@ class EventQueue(
         val slot = QueueSlotImpl(SlotOrigin.REQUESTED, requester, Instant.now())
         slot.assign(definition)
 
-        val insertAt = slots.indexOfFirst { it.state == SlotState.PLANNED || it.state == SlotState.PREPARING }
         // Anything already prepared has been announced with a start time, so it
-        // is cancelled rather than silently shifted.
-        if (insertAt < 0) slots.add(slot) else {
-            slots.filter { it.state == SlotState.PREPARED }.forEach(QueueSlotImpl::cancel)
-            slots.add(insertAt, slot)
-        }
-        prune()
+        // is discarded rather than silently shifted.
+        slots.filter { it.state == SlotState.PREPARED }.forEach(::discard)
+
+        val insertAt = slots.indexOfFirst { it.state == SlotState.PLANNED || it.state == SlotState.PREPARING }
+        if (insertAt < 0) slots.add(slot) else slots.add(insertAt, slot)
+
         rescheduleFrom(Instant.now())
         return slot
     }
@@ -153,7 +167,6 @@ class EventQueue(
         if (!running) return
         val now = Instant.now()
 
-        prune()
         endFinished(now)
         plan(now)
         rescheduleFrom(now)
@@ -164,13 +177,18 @@ class EventQueue(
         announce(now)
     }
 
-    /** Drops terminal slots so `upcoming` only ever shows what is still ahead. */
-    private fun prune() {
-        slots.removeAll { it.state.isTerminal }
+    /**
+     * Abandons a slot and drops it, releasing whatever its preparation had
+     * already allocated. Keeping `slots` free of terminal entries is what lets
+     * every loop here iterate it directly.
+     */
+    private fun discard(slot: QueueSlotImpl) {
+        slot.cancel()
+        slots.remove(slot)
     }
 
     private fun endFinished(now: Instant) {
-        val slot = slots.firstOrNull { it.state == SlotState.RUNNING } ?: return
+        val slot = runningSlot() ?: return
         val prepared = slot.prepared ?: return
         if (now >= prepared.endAt) endActive()
     }
@@ -181,11 +199,12 @@ class EventQueue(
      * later in the same tick and assigns the real one before anything reads it.
      */
     private fun plan(now: Instant) {
-        while (slots.count { !it.state.isTerminal } < definition.lookahead) {
+        while (slots.size < definition.lookahead) {
             slots.add(QueueSlotImpl(SlotOrigin.SCHEDULED, null, now))
         }
-        slots.filter { it.state == SlotState.PLANNED && it.definition == null }
-            .forEach { slot -> ask(slot) }
+        slots.forEach { slot ->
+            if (slot.state == SlotState.PLANNED && slot.definition == null) ask(slot)
+        }
     }
 
     private fun ask(slot: QueueSlotImpl) {
@@ -233,12 +252,12 @@ class EventQueue(
         // Nothing can start sooner than it can be prepared. Writing the clamp
         // back to the anchor keeps it from being reapplied against a later
         // `now` on every tick, which would push the head away forever.
-        if (activeSlot == null && cursor.isBefore(earliest)) {
+        if (runningSlot() == null && cursor.isBefore(earliest)) {
             cursor = earliest
             nextAvailable = cursor
         }
 
-        slots.filterNot { it.state.isTerminal }.forEach { slot ->
+        slots.forEach { slot ->
             if (slot.state == SlotState.PLANNED && slot.startAt != cursor)
                 slot.reschedule(cursor)
             val cooldown = slot.definition?.cooldown ?: Duration.ZERO
@@ -253,7 +272,7 @@ class EventQueue(
      * every other fact already exist.
      */
     private fun prepare(now: Instant) {
-        val slot = slots.firstOrNull { !it.state.isTerminal } ?: return
+        val slot = slots.firstOrNull() ?: return
         if (slot.state != SlotState.PLANNED) return
         val definition = slot.definition ?: return
         if (now.isBefore(slot.startAt.minus(this.definition.prepareLead))) return
@@ -294,15 +313,13 @@ class EventQueue(
         EventControl.logger.error(
             "Failed preparing '{}' for queue '{}', replanning the slot", definition.key, this.definition.key, failure
         )
-        slot.cancel()
-        prune()
+        discard(slot)
     }
 
     private fun announce(now: Instant) {
-        slots.filterNot { it.state.isTerminal }.forEach { slot ->
+        slots.forEach { slot ->
             val prepared = slot.prepared ?: return@forEach
-            definition.announcements
-                .filter { it.trigger == Announcement.Trigger.START }
+            definition.startAnnouncements
                 .forEach { announcement ->
                     val due = prepared.startAt.plusMillis(announcement.offsetMillis)
                     if (now < due) return@forEach
@@ -317,8 +334,8 @@ class EventQueue(
     }
 
     private fun launch(now: Instant) {
-        if (activeSlot != null) return
-        val slot = slots.firstOrNull { !it.state.isTerminal } ?: return
+        if (runningSlot() != null) return
+        val slot = slots.firstOrNull() ?: return
         if (slot.state != SlotState.PREPARED) return
         val prepared = slot.prepared ?: return
         if (now.isBefore(slot.startAt)) return
@@ -337,13 +354,12 @@ class EventQueue(
                     "Failed starting '{}' on queue '{}'", prepared.definition.key, definition.key, it
                 )
                 context.close()
-                slot.cancel()
-                prune()
+                discard(slot)
             }
     }
 
     private fun endActive() {
-        val slot = slots.firstOrNull { it.state == SlotState.RUNNING } ?: return
+        val slot = runningSlot() ?: return
         val prepared = slot.prepared
         val active = slot.active
 
@@ -351,8 +367,7 @@ class EventQueue(
             .onFailure { EventControl.logger.error("An event failed while ending", it) }
 
         if (prepared != null) {
-            definition.announcements
-                .filter { it.trigger == Announcement.Trigger.END }
+            definition.endAnnouncements
                 .forEach { announcement ->
                     if (slot.sentAnnouncements.add(announcement.identity())) dispatch(announcement, slot, prepared)
                 }
@@ -361,12 +376,14 @@ class EventQueue(
         activeContext?.close()
         activeContext = null
         slot.markFinished()
-        prune()
+        slots.remove(slot)
 
         val now = Instant.now()
         nextAvailable = now.plus(definition.interval)
         rescheduleFrom(now)
     }
+
+    private fun runningSlot(): QueueSlotImpl? = slots.firstOrNull { it.state == SlotState.RUNNING }
 
     private fun dispatch(announcement: Announcement, slot: QueueSlotImpl, prepared: PreparedEvent) {
         val context = activeContext ?: SimpleAudienceContext(world, prepared.location, emptyList())
@@ -375,8 +392,8 @@ class EventQueue(
 
     //endregion
 
-    /** Non-terminal slots worth writing to disk, so a restart resumes the timeline. */
-    fun persistableSlots(): List<QueueSlotImpl> = slots.filterNot { it.state.isTerminal }
+    /** The timeline as it stands, for writing to disk so a restart resumes it. */
+    fun persistableSlots(): List<QueueSlotImpl> = slots.toList()
 
     /**
      * Resumes a saved timeline. The head's saved start time becomes the anchor,

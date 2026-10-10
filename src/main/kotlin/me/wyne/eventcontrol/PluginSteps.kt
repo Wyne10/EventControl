@@ -68,6 +68,7 @@ object InitializeI18n : PluginStep<EventControl> {
                 ).get(EmptyValidator())
             )
             .setUsePlayerLanguage(plugin.config.getBoolean("usePlayerLanguage", true))
+            .loadLanguage("lang/en.yml")
             .loadLanguage("lang/ru.yml")
             .build()
     }

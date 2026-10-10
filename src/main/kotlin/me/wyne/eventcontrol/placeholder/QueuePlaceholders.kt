@@ -21,6 +21,10 @@ import java.time.Instant
  * placeholders resolve on the main thread once per player per frame. The
  * upcoming fields work at all only because slots are prepared ahead of time —
  * there is nothing here to smuggle through another plugin's namespace.
+ *
+ * Durations are raw milliseconds. Formatting belongs to the DateTimeFormat
+ * expansion, which the server owner points at these values:
+ * `%dtf_duration_{eventcontrol_main_next_starts-in}ms_mm'm 'ss's'%`.
  */
 @Singleton
 class QueuePlaceholders @Inject constructor(private val queues: QueueService) : PlaceholderExpansion() {
@@ -57,7 +61,7 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
         "upcoming" -> queue.upcoming.size.toString()
         "lookahead" -> queue.lookahead.toString()
         "world" -> queue.world.name
-        "interval" -> format(queue.interval)
+        "interval" -> queue.interval.toMillis().toString()
         else -> null
     }
 
@@ -86,9 +90,9 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
             "origin" -> slot.origin.name.lowercase()
             "requester" -> slot.requester ?: ""
             "prepared" -> (prepared != null).toString()
-            "in", "starts-in" -> format(until(slot.startAt))
-            "ends-in" -> prepared?.let { format(until(it.endAt)) } ?: ""
-            "duration" -> definition?.let { format(it.duration) } ?: ""
+            "in", "starts-in" -> millisUntil(slot.startAt)
+            "ends-in" -> prepared?.let { millisUntil(it.endAt) } ?: ""
+            "duration" -> definition?.duration?.toMillis()?.toString() ?: ""
             "x" -> prepared?.location?.blockX?.toString() ?: ""
             "y" -> prepared?.location?.blockY?.toString() ?: ""
             "z" -> prepared?.location?.blockZ?.toString() ?: ""
@@ -98,17 +102,8 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
         }
     }
 
-    private fun until(target: Instant) =
-        Duration.between(Instant.now(), target).let { if (it.isNegative) Duration.ZERO else it }
-
-    private fun format(duration: Duration): String {
-        val seconds = duration.seconds
-        val hours = seconds / 3600
-        val minutes = (seconds % 3600) / 60
-        val remainder = seconds % 60
-        return if (hours > 0) "%d:%02d:%02d".format(hours, minutes, remainder)
-        else "%d:%02d".format(minutes, remainder)
-    }
+    private fun millisUntil(target: Instant): String =
+        Duration.between(Instant.now(), target).toMillis().coerceAtLeast(0L).toString()
 
     companion object {
         lateinit var instance: QueuePlaceholders

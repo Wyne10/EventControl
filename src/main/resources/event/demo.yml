@@ -1,13 +1,13 @@
-# `type` указывает на вид события, зарегистрированный плагином-поставщиком.
-# Ключи самого вида читаются из этой же секции.
+# `type` names a kind of event registered by a providing plugin. That kind's own
+# keys are read from this same section.
 type: demo
 
-# Ключ имени в языковом файле плагина, которому принадлежит событие.
+# The name key, looked up in the language files of whichever plugin owns the event.
 display: event-demo
 
 duration: 10m
 cooldown: 0s
 
-# Вес для weighted-random. Нулевой вес оставляет событие доступным
-# только по запросу администратора или по голосованию.
+# Weight for weighted-random. A weight of zero leaves the event available only by
+# an admin request or a player poll.
 weight: 1

@@ -31,6 +31,12 @@ data class QueueDefinition(
     val world: World?
         get() = Bukkit.getWorld(worldName)
 
+    val startAnnouncements: List<Announcement> =
+        announcements.filter { it.trigger == Announcement.Trigger.START }
+
+    val endAnnouncements: List<Announcement> =
+        announcements.filter { it.trigger == Announcement.Trigger.END }
+
     object Factory : GenericFactory<QueueDefinition> {
 
         override fun create(key: String, config: ConfigurationSection): QueueDefinition {

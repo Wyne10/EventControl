@@ -2,7 +2,7 @@
 
 format-queue-entry: "<gray>▶ <white><queue> <gray>— <white><state><gray>, впереди: <white><upcoming>"
 format-queue-header: "<gold>▶ <white>Очередь <gold><queue> <gray>(<state>)"
-format-slot-entry: " <gray><index>. <white><event> <gray><state>/<origin> <gray>через <white><starts-in> <gray><position>"
+format-slot-entry: " <gray><index>. <white><event> <gray><state>/<origin> <gray>через <white>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'% <gray><position>"
 format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gray>) <yellow><click:run_command:'/event poll vote <queue> <event>'>[Голосовать]</click>"
 
 ### Messages
@@ -10,13 +10,13 @@ format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gra
 ## Info
 
 info-no-queues: "<gray>▶ <white>Сейчас нет активных очередей событий"
-info-event-active: "<gold>▶ <white>Сейчас идёт <gold><event> <white>— до конца <gold><ends-in><white>, координаты <gold><position>"
-info-event-upcoming: "<gray>▶ <white>Далее <gold><event> <white>— через <gold><starts-in><white>, координаты <gold><position>"
-info-event-starting-soon: "<gold>▶ <white><event-name> <white>начнётся через <gold><starts-in><white>, координаты <gold><position>"
-info-event-started: "<gold>▶ <white><event-name> <white>началось на координатах <gold><position><white>! До конца <gold><ends-in>"
+info-event-active: "<gold>▶ <white>Сейчас идёт <gold><event> <white>— до конца <gold>%dtf_duration_<ends-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
+info-event-upcoming: "<gray>▶ <white>Далее <gold><event> <white>— через <gold>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
+info-event-starting-soon: "<gold>▶ <white><event-name> <white>начнётся через <gold>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'%<white>, координаты <gold><position>"
+info-event-started: "<gold>▶ <white><event-name> <white>началось на координатах <gold><position><white>! До конца <gold>%dtf_duration_<ends-in>ms_mm' мин. 'ss' сек.'%"
 info-event-ended: "<gray>▶ <white><event-name> <white>завершилось"
 info-no-poll: "<gray>▶ <white>Сейчас нет открытых голосований"
-info-poll-opened: "<gold>▶ <white>Голосование за следующее событие в очереди <gold><queue><white>! До конца <gold><closes-in>"
+info-poll-opened: "<gold>▶ <white>Голосование за следующее событие в очереди <gold><queue><white>! До конца <gold>%dtf_duration_<closes-in>ms_mm' мин. 'ss' сек.'%"
 info-poll-closed: "<gold>▶ <white>Голосование завершено: <gold><event> <white>(<gold><votes><white> из <gold><total><white> голосов)"
 info-poll-your-vote: "<gray>▶ <white>Ваш голос: <gold><event>"
 
@@ -33,7 +33,7 @@ success-plugin-reload: "<green>▶ <white>Плагин перезагружен!
 success-queue-started: "<green>▶ <white>Очередь <green><queue> <white>запущена"
 success-queue-stopped: "<green>▶ <white>Очередь <green><queue> <white>остановлена"
 success-queue-skipped: "<green>▶ <white>Событие <green><event> <white>пропущено в очереди <green><queue>"
-success-event-requested: "<green>▶ <white>Событие <green><event> <white>добавлено в очередь <green><queue><white>, старт через <green><starts-in>"
+success-event-requested: "<green>▶ <white>Событие <green><event> <white>добавлено в очередь <green><queue><white>, старт через <green>%dtf_duration_<starts-in>ms_mm' мин. 'ss' сек.'%"
 success-poll-voted: "<green>▶ <white>Голос за <green><event> <white>учтён"
 success-poll-closed: "<green>▶ <white>Голосование в очереди <green><queue> <white>завершено, победил <green><event>"
 

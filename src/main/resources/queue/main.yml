@@ -1,25 +1,25 @@
-# Одна очередь — это расписание. Движок держит `lookahead` слотов
-# запланированными и готовит первый за `prepare-lead` до старта, поэтому
-# координаты и всё остальное известны заранее.
+# A queue is a timeline. The engine keeps `lookahead` slots planned and resolves
+# the head one `prepare-lead` before it starts, so a location and everything else
+# about an event are known in advance.
 world: world
 
-# Промежуток между событиями.
+# Gap between consecutive events.
 interval: 30m
 
-# За сколько до старта событие должно быть полностью подготовлено.
+# How long before its start time the head slot must be fully prepared.
 prepare-lead: 5m
 
-# Сколько слотов держать запланированными: %eventcontrol_main_next2_name%
-# работает только в пределах этого окна.
+# How many slots stay planned. %eventcontrol_main_next2_name% only resolves
+# inside this window.
 lookahead: 3
 
 # sequential | weighted-random | poll
 source: weighted-random
 weighted-random-avoid-repeats: 1
 
-# Настройки источника `poll`: сколько длится голосование и сколько
-# вариантов в бюллетене. Голосование открывается до того, как слот
-# будет заполнен, поэтому варианты можно показать игрокам заранее.
+# Settings for the `poll` source: how long voting stays open and how many
+# options are on the ballot. The poll opens before the slot is filled, so the
+# options can be shown to players with real detail.
 poll-window: 2m
 poll-candidates: 3
 
@@ -27,12 +27,13 @@ events:
   - demo
   - demo-wide
 
-# Объявления задаются относительно известного времени старта, поэтому
-# предупреждение и сообщение о старте — один и тот же механизм.
+# Announcements are scheduled against a start time the engine already knows, so
+# an early warning and the start message are the same mechanism.
 #
-# `at` задаёт и точку отсчёта, и сдвиг: `-5m` — за пять минут до старта,
-# `0` — в момент старта, `end` — в конце, `end-10s` — за десять секунд до конца.
-# Ключа `on` нет специально: YAML читает `on` как булево значение.
+# `at` carries both the anchor and the offset: `-5m` is five minutes before the
+# start, `0` is as it starts, `end` is as it ends, `end-10s` ten seconds before
+# the end. There is deliberately no `on` key — YAML reads a bare `on` as a
+# boolean, so `on: end` would never parse.
 announce:
   - at: -5m
     key: info-event-starting-soon

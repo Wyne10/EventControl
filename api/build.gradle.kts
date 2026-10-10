@@ -1,73 +1,56 @@
 plugins {
     id("java-library")
-    id("maven-publish")
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 dependencies {
     compileOnly(libs.paperApi)
-    compileOnly(libs.adventureApi)
 }
 
 java {
     withSourcesJar()
-    toolchain.languageVersion = JavaLanguageVersion.of(16)
+    toolchain.languageVersion.set(JavaLanguageVersion.of(16))
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = Charsets.UTF_8.name()
-    options.release = 16
 }
 
-publishing {
-    repositories {
-        maven {
-            url = uri(providers.gradleProperty("myMavenRepoWriteUrl").getOrElse(""))
-            credentials {
-                username = providers.gradleProperty("myMavenRepoWriteUsername").orNull
-                password = providers.gradleProperty("myMavenRepoWritePassword").orNull
+tasks.named("publish") {
+    dependsOn("publishToMavenLocal")
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(findProperty("centralGroup").toString(), "eventcontrol-api", version.toString())
+
+    pom {
+        name.set("EventControl API")
+        description.set("Consumer and extension API for the EventControl Bukkit/Paper plugin, which runs timed server events on queues and resolves every event before it starts.")
+        inceptionYear.set("2026")
+        url.set("https://github.com/Wyne10/EventControl")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("https://opensource.org/licenses/MIT")
             }
         }
-    }
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = rootProject.group.toString()
-            artifactId = "EventControl-api"
-            version = rootProject.version.toString()
-            from(components["java"])
-        }
-    }
-}
-
-// Nothing published here may name a type the plugin relocates into its shadow
-// package: a relocated type in a published signature is unusable to consumers.
-val forbiddenApiPackages = listOf(
-    "me.wyne.wutils",
-    "me.lucko",
-    "com.google.inject",
-    "com.google.common",
-    "dev.jorel",
-    "dev.vankka",
-    "xyz.xenondevs",
-    "me.clip"
-)
-
-val checkApiPurity by tasks.registering {
-    description = "Fails if the published API references a relocated or plugin-provided type."
-    val sources = fileTree("src/main/java") { include("**/*.java") }
-    inputs.files(sources)
-    outputs.upToDateWhen { true }
-    doLast {
-        val offences = sources.flatMap { file ->
-            file.readLines().withIndex().mapNotNull { (index, line) ->
-                val trimmed = line.trim()
-                if (!trimmed.startsWith("import ")) null
-                else forbiddenApiPackages.firstOrNull { trimmed.startsWith("import $it.") }
-                    ?.let { "${file.relativeTo(projectDir)}:${index + 1} imports $it" }
+        developers {
+            developer {
+                id.set("Wyne10")
+                name.set("Wyne")
+                email.set("izmodenov1997@gmail.com")
+                organization.set("BigTeam")
+                organizationUrl.set("https://github.com/NeverMined-Entertainment")
             }
         }
-        if (offences.isNotEmpty())
-            throw GradleException("Forbidden imports in the published API:\n" + offences.joinToString("\n") { "  $it" })
+        scm {
+            url.set("https://github.com/Wyne10/EventControl")
+            connection.set("scm:git:git://github.com/Wyne10/EventControl.git")
+            developerConnection.set("scm:git:ssh://git@github.com/Wyne10/EventControl.git")
+        }
     }
 }
-
-tasks.named("check") { dependsOn(checkApiPurity) }

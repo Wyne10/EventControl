@@ -16,8 +16,6 @@ dependencies {
     compileOnly(libs.paperApi)
     compileOnly(libs.placeholderApi)
     compileOnly(libs.commandApi)
-    compileOnly(libs.invUi)
-    compileOnly(libs.invUiKotlin)
 
     implementation(project(":api"))
 
@@ -87,7 +85,7 @@ bukkit {
     author = findProperty("author").toString()
     main = "me.wyne.eventcontrol.EventControl"
     apiVersion = "1.16"
-    softDepend = listOf("PlaceholderAPI", "CommandAPI", "InvUi")
+    softDepend = listOf("PlaceholderAPI", "CommandAPI")
     permissions {
         register("eventcontrol.*") {
             children = listOf(

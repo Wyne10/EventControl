@@ -1,5 +1,5 @@
-# Второй пример: тот же вид события, но с другим радиусом поиска места.
-# Два события нужны, чтобы `weighted-random` и `poll` имели из чего выбирать.
+# A second example: the same kind of event with a wider search radius. Two events
+# are needed for `weighted-random` and `poll` to have something to choose between.
 type: demo
 
 display: event-demo-wide

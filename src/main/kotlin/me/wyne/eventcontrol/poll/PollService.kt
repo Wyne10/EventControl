@@ -65,7 +65,7 @@ class PollService @Inject constructor(registries: Registries) {
         player.placeholderComponent(
             "info-poll-opened",
             "queue" replace poll.queueKey,
-            "closes-in" replace countdown(poll.closesAt)
+            "closes-in" replace millisUntil(poll.closesAt)
         ).sendMessage(player)
 
         val counts = poll.tally
@@ -95,7 +95,9 @@ class PollService @Inject constructor(registries: Registries) {
     }
 }
 
-private fun countdown(target: Instant): String {
-    val seconds = Duration.between(Instant.now(), target).seconds.coerceAtLeast(0L)
-    return "%d:%02d".format(seconds / 60, seconds % 60)
-}
+/**
+ * Milliseconds, so the language file formats the countdown with the
+ * DateTimeFormat expansion rather than this plugin deciding the shape.
+ */
+private fun millisUntil(target: Instant): String =
+    Duration.between(Instant.now(), target).toMillis().coerceAtLeast(0L).toString()

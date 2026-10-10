@@ -1,10 +1,3 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-}
-
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
 }
@@ -22,11 +15,9 @@ dependencyResolutionManagement {
             url = uri("https://repo.papermc.io/repository/maven-public/")
         }
         maven {
-            url = uri("https://repo.helpch.at/releases/")
-        }
-        maven {
-            url = uri("https://repo.xenondevs.xyz/releases")
+            url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         }
     }
 }
+
 include("api")
