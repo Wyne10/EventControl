@@ -15,7 +15,7 @@ lookahead: 3
 # Which source decides what fills a slot. `sequential` and `weighted-random`
 # ship here; others are registered by other plugins — `poll` comes from
 # EventPoll, and reads its own `poll-window` and `poll-candidates` from this
-# same section.
+# same section, falling back to the defaults in EventPoll's own config.yml.
 source: weighted-random
 weighted-random-avoid-repeats: 1
 
