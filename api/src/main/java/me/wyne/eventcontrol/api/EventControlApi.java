@@ -27,4 +27,5 @@ public final class EventControlApi {
         provider = newProvider;
         registries = newRegistries;
     }
+
 }

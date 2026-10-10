@@ -65,4 +65,5 @@ public abstract class AbstractPreparedEvent implements PreparedEvent {
      */
     protected void onRelease() {
     }
+
 }

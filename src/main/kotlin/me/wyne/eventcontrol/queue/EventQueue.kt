@@ -129,13 +129,6 @@ class EventQueue(
         return skipped
     }
 
-    /** Ends the running event early, without touching the rest of the timeline. */
-    fun stopCurrent(): Boolean {
-        if (activeSlot == null) return false
-        endActive()
-        return true
-    }
-
     /**
      * Puts [definition] at the front of the timeline. An explicit request
      * outranks whatever the configured source would have chosen.

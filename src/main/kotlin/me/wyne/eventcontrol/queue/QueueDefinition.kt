@@ -19,8 +19,7 @@ data class QueueDefinition(
     val sourceKey: String,
     val sourceConfig: ConfigurationSection,
     val eventKeys: List<String>,
-    val autoStart: Boolean,
-    val resumeInterrupted: Boolean
+    val autoStart: Boolean
 ) {
 
     object Factory : GenericFactory<QueueDefinition> {
@@ -47,8 +46,7 @@ data class QueueDefinition(
                 sourceKey = section.getString("source", "weighted-random")!!,
                 sourceConfig = section,
                 eventKeys = events,
-                autoStart = section.getBoolean("auto-start", true),
-                resumeInterrupted = section.getBoolean("resume-interrupted", false)
+                autoStart = section.getBoolean("auto-start", true)
             )
         }
     }

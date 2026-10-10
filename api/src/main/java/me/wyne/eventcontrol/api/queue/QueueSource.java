@@ -27,4 +27,5 @@ public interface QueueSource {
     /** Called when the queue reloads, so a source can drop cached state. */
     default void reset() {
     }
+
 }

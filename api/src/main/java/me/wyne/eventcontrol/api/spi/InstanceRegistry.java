@@ -19,4 +19,5 @@ public interface InstanceRegistry<T> {
 
     /** Every registered key, including additions from other plugins. */
     @NotNull Set<String> keys();
+
 }

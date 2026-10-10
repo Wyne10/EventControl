@@ -39,4 +39,5 @@ public interface QueueView {
 
     /** Every definition this queue may select. */
     @NotNull List<EventDefinition> getCandidates();
+
 }

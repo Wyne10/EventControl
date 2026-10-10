@@ -36,4 +36,5 @@ public interface EventType {
      */
     @NotNull CompletableFuture<PreparedEvent> prepare(@NotNull EventDefinition definition,
                                                       @NotNull PrepareContext context);
+
 }

@@ -76,4 +76,5 @@ public abstract class AbstractEventType implements EventType {
      */
     protected abstract @NotNull PreparedEvent prepareBlocking(@NotNull EventDefinition definition,
                                                               @NotNull PrepareContext context);
+
 }

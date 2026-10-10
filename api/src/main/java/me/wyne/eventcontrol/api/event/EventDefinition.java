@@ -33,4 +33,5 @@ public interface EventDefinition {
      * selectable only by an explicit request or a poll.
      */
     int getWeight();
+
 }

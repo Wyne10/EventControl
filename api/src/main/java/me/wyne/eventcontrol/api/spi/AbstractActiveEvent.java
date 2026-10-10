@@ -60,4 +60,5 @@ public abstract class AbstractActiveEvent implements ActiveEvent {
      */
     protected void onEnded() {
     }
+
 }

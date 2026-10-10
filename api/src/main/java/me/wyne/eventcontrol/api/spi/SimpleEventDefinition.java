@@ -58,4 +58,5 @@ public class SimpleEventDefinition implements EventDefinition {
     public int getWeight() {
         return weight;
     }
+
 }

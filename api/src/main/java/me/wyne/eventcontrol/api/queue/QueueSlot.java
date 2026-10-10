@@ -32,4 +32,5 @@ public interface QueueSlot {
 
     /** Non-null only while {@link SlotState#RUNNING}. */
     @Nullable ActiveEvent getActive();
+
 }

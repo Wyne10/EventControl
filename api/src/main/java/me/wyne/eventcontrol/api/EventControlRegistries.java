@@ -29,4 +29,5 @@ public interface EventControlRegistries {
 
     /** Whether registrations are still accepted. */
     boolean isOpen();
+
 }

@@ -66,4 +66,5 @@ public final class Durations {
                 throw new IllegalArgumentException("Unknown duration unit '" + suffix + "' in '" + value + "'");
         }
     }
+
 }

@@ -27,4 +27,5 @@ public enum SlotState {
     public boolean isTerminal() {
         return this == FINISHED || this == CANCELLED;
     }
+
 }

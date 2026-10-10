@@ -28,7 +28,7 @@ import java.time.Instant
 @Singleton
 @LoadableMeta(priority = 2)
 class QueueService @Inject constructor(
-    private val plugin: EventControl,
+    plugin: EventControl,
     private val registries: Registries,
     private val definitions: EventDefinitionProvider,
     private val queues: QueueProvider
@@ -72,7 +72,7 @@ class QueueService @Inject constructor(
     private fun build(definition: QueueDefinition) {
         val factory = requireNotNull(registries.queueSources().get(definition.sourceKey)) {
             "Queue '${definition.key}' names unknown source '${definition.sourceKey}'; " +
-                "registered sources: ${registries.queueSources().keys()}"
+                    "registered sources: ${registries.queueSources().keys()}"
         }
         val source: QueueSource = factory.create(definition.sourceKey, definition.sourceConfig)
         val queue = EventQueue(definition, source) { candidatesOf(definition) }

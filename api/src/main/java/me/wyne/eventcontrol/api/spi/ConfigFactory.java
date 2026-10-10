@@ -13,4 +13,5 @@ import org.jetbrains.annotations.NotNull;
 public interface ConfigFactory<T> {
 
     @NotNull T create(@NotNull String key, @NotNull ConfigurationSection config);
+
 }

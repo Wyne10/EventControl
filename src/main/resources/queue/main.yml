@@ -19,6 +19,10 @@ lookahead: 3
 source: weighted-random
 weighted-random-avoid-repeats: 1
 
+# Whether this queue starts ticking as soon as it loads. A queue with
+# `auto-start: false` waits for `/eventcontrol start <queue>`.
+auto-start: true
+
 events:
   - demo
   - demo-wide

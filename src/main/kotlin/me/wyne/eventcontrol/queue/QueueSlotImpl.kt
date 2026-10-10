@@ -10,8 +10,8 @@ import java.time.Duration
 import java.time.Instant
 
 class QueueSlotImpl(
-    private var origin: SlotOrigin,
-    private var requester: String?,
+    private val origin: SlotOrigin,
+    private val requester: String?,
     private var startAt: Instant
 ) : QueueSlot {
 
@@ -50,11 +50,6 @@ class QueueSlotImpl(
 
     fun reschedule(startAt: Instant) {
         this.startAt = startAt
-    }
-
-    fun promoteOrigin(origin: SlotOrigin, requester: String?) {
-        this.origin = origin
-        this.requester = requester
     }
 
     fun markPreparing() {

@@ -37,4 +37,5 @@ public interface EventContext {
      * bound here, and the next slot.
      */
     void endNow();
+
 }

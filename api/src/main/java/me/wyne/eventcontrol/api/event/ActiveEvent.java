@@ -23,4 +23,5 @@ public interface ActiveEvent {
      */
     default void onEnd() {
     }
+
 }
