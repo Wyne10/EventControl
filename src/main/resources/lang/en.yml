@@ -3,7 +3,6 @@
 format-queue-entry: "<gray>▶ <white><queue> <gray>— <white><state><gray>, upcoming: <white><upcoming>"
 format-queue-header: "<gold>▶ <white>Queue <gold><queue> <gray>(<state>)"
 format-slot-entry: " <gray><index>. <white><event> <gray><state>/<origin> <gray>in <white>%dtf_duration_<starts-in>ms_mm'm 'ss's'% <gray><position>"
-format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gray>) <yellow><click:run_command:'/event poll vote <queue> <event>'>[Vote]</click>"
 
 ### Messages
 
@@ -12,17 +11,12 @@ format-poll-candidate: " <gray>• <white><event-name> <gray>(<white><votes><gra
 info-no-queues: "<gray>▶ <white>No event queues are running right now"
 info-event-active: "<gold>▶ <white>Running now: <gold><event> <white>— ends in <gold>%dtf_duration_<ends-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
 info-event-upcoming: "<gray>▶ <white>Next: <gold><event> <white>— in <gold>%dtf_duration_<starts-in>ms_mm'm 'ss's'%<white>, at <gold><position>"
-info-no-poll: "<gray>▶ <white>No vote is open right now"
-info-poll-opened: "<gold>▶ <white>Vote for the next event in queue <gold><queue><white>! Closes in <gold>%dtf_duration_<closes-in>ms_mm'm 'ss's'%"
-info-poll-closed: "<gold>▶ <white>Vote finished: <gold><event> <white>(<gold><votes><white> of <gold><total><white> votes)"
-info-poll-your-vote: "<gray>▶ <white>Your vote: <gold><event>"
 
 ## Error
 
 error-unknown-queue: "<red>▶ <white>No such queue: <red><queue>"
 error-unknown-event: "<red>▶ <white>No such event: <red><event>"
 error-queue-empty: "<red>▶ <white>Nothing to skip in queue <red><queue>"
-error-poll-vote: "<red>▶ <white>Cannot vote for <red><event> <white>in queue <red><queue>"
 
 ## Success
 
@@ -31,8 +25,6 @@ success-queue-started: "<green>▶ <white>Queue <green><queue> <white>started"
 success-queue-stopped: "<green>▶ <white>Queue <green><queue> <white>stopped"
 success-queue-skipped: "<green>▶ <white>Skipped <green><event> <white>in queue <green><queue>"
 success-event-requested: "<green>▶ <white>Queued <green><event> <white>in <green><queue><white>, starting in <green>%dtf_duration_<starts-in>ms_mm'm 'ss's'%"
-success-poll-voted: "<green>▶ <white>Vote for <green><event> <white>recorded"
-success-poll-closed: "<green>▶ <white>Vote in queue <green><queue> <white>finished, <green><event> <white>won"
 
 ### Events
 

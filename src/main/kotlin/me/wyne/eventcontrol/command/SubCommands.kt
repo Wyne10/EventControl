@@ -8,7 +8,6 @@ import dev.jorel.commandapi.executors.CommandArguments
 import dev.jorel.commandapi.executors.CommandExecutor
 import me.wyne.eventcontrol.EventControl
 import me.wyne.eventcontrol.event.EventDefinitionProvider
-import me.wyne.eventcontrol.poll.PollService
 import me.wyne.eventcontrol.queue.EventQueue
 import me.wyne.eventcontrol.queue.QueueService
 import me.wyne.wutils.i18n.kotlin.placeholderComponent
@@ -44,18 +43,7 @@ internal fun eventArgument(definitions: EventDefinitionProvider): Argument<*> =
         ArgumentSuggestions.strings { definitions.map.keys.toTypedArray() }
     )
 
-internal fun pollQueueArgument(polls: PollService): Argument<*> =
-    StringArgument("queue").replaceSuggestions(
-        ArgumentSuggestions.strings { polls.all.filter { it.isOpen }.map { it.queueKey }.toTypedArray() }
-    )
 
-internal fun pollCandidateArgument(polls: PollService): Argument<*> =
-    StringArgument("event").replaceSuggestions(
-        ArgumentSuggestions.strings { info ->
-            val queueKey = info.previousArgs().get("queue") as String?
-            queueKey?.let { polls[it] }?.candidates?.map { it.key }?.toTypedArray() ?: emptyArray()
-        }
-    )
 
 /** Sends its own error, so a caller reads as `?: return`. */
 internal fun resolveQueue(

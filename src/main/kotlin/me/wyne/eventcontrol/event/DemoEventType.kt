@@ -13,7 +13,9 @@ import me.wyne.eventcontrol.api.spi.AbstractEventType
 import me.wyne.eventcontrol.api.spi.AbstractPreparedEvent
 import me.wyne.eventcontrol.api.spi.SimpleEventDefinition
 import me.wyne.eventcontrol.registry.Registries
+import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.configuration.ConfigurationSection
 import java.util.concurrent.ThreadLocalRandom
 
@@ -38,14 +40,17 @@ class DemoEventType @Inject constructor(registries: Registries) :
 
     override fun prepareBlocking(definition: EventDefinition, context: PrepareContext): PreparedEvent {
         val demo = definition as DemoDefinition
+        val world = requireNotNull(demo.world) {
+            "Demo event '${demo.key}' targets world '${demo.worldName}', which is not loaded"
+        }
         val random = ThreadLocalRandom.current()
-        val spawn = context.world.spawnLocation
+        val spawn = world.spawnLocation
 
         val x = spawn.blockX + random.nextInt(-demo.radius, demo.radius + 1)
         val z = spawn.blockZ + random.nextInt(-demo.radius, demo.radius + 1)
         // Picking a surface Y needs the main thread, so the same budget a real
         // search would use is spent here instead of after the event starts.
-        val location = Location(context.world, x.toDouble(), spawn.y, z.toDouble())
+        val location = Location(world, x.toDouble(), spawn.y, z.toDouble())
 
         logger.debug("Prepared demo event '{}' at {}, {}", demo.key, x, z)
         return DemoPreparedEvent(demo, location, context.startAt)
@@ -59,6 +64,11 @@ private class DemoDefinition(
 ) : SimpleEventDefinition(key, type, config) {
 
     val radius: Int = config.getInt("radius", 200).coerceAtLeast(1)
+
+    val worldName: String = config.getString("world", Bukkit.getWorlds()[0].name)!!
+
+    val world: World?
+        get() = Bukkit.getWorld(worldName)
 }
 
 private class DemoPreparedEvent(

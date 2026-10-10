@@ -66,7 +66,6 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
         "running" -> queue.isRunning.toString()
         "upcoming" -> queue.upcoming.size.toString()
         "lookahead" -> queue.lookahead.toString()
-        "world" -> queue.world.name
         "interval" -> queue.interval.toMillis().toString()
         else -> null
     }
@@ -113,6 +112,8 @@ class QueuePlaceholders @Inject constructor(private val queues: QueueService) : 
             "z" -> prepared?.location?.blockZ?.toString() ?: ""
             "position" -> prepared?.location
                 ?.let { "${it.blockX}, ${it.blockY}, ${it.blockZ}" } ?: ""
+
+            "world" -> prepared?.location?.world?.name ?: ""
             else -> null
         }
     }

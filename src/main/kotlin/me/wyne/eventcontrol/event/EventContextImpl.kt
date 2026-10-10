@@ -10,8 +10,7 @@ import java.util.UUID
 
 /**
  * What a running event is handed. Everything bound here is closed by the engine
- * when the event ends, which replaces the teardown each event plugin used to
- * hand-write.
+ * when the event ends.
  */
 class EventContextImpl(
     private val queue: QueueView,

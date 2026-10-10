@@ -9,10 +9,6 @@ import me.wyne.eventcontrol.api.queue.SlotState
 import java.time.Duration
 import java.time.Instant
 
-/**
- * One position on a timeline. The state machine here is what each event plugin
- * used to keep as three separate maps keyed by queue.
- */
 class QueueSlotImpl(
     private var origin: SlotOrigin,
     private var requester: String?,

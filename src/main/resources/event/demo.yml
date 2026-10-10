@@ -5,6 +5,11 @@ type: demo
 # The name key, looked up in EventControl's own language files.
 display: event-demo
 
+# Where this event happens. The queue does not decide: an event picks its own
+# place, so the key belongs to whichever type reads it — here, `demo`.
+# Defaults to the server's first world.
+world: world
+
 duration: 10m
 cooldown: 0s
 

@@ -20,4 +20,5 @@ public interface EventControlProvider {
     @Nullable EventDefinition getDefinition(@NotNull String definitionKey);
 
     @NotNull Collection<EventDefinition> getDefinitions();
+
 }

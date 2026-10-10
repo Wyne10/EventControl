@@ -1,7 +1,6 @@
 package me.wyne.eventcontrol.api.queue;
 
 import me.wyne.eventcontrol.api.event.EventDefinition;
-import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,8 +14,6 @@ import java.util.List;
 public interface QueueView {
 
     @NotNull String getKey();
-
-    @NotNull World getWorld();
 
     @NotNull Duration getInterval();
 

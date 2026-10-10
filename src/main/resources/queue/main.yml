@@ -1,7 +1,6 @@
 # A queue is a timeline. The engine keeps `lookahead` slots planned and resolves
 # the head one `prepare-lead` before it starts, so a location and everything else
 # about an event are known in advance.
-world: world
 
 # Gap between consecutive events.
 interval: 30m
@@ -13,15 +12,12 @@ prepare-lead: 5m
 # inside this window.
 lookahead: 3
 
-# sequential | weighted-random | poll
+# Which source decides what fills a slot. `sequential` and `weighted-random`
+# ship here; others are registered by other plugins — `poll` comes from
+# EventPoll, and reads its own `poll-window` and `poll-candidates` from this
+# same section.
 source: weighted-random
 weighted-random-avoid-repeats: 1
-
-# Settings for the `poll` source: how long voting stays open and how many
-# options are on the ballot. The poll opens before the slot is filled, so the
-# options can be shown to players with real detail.
-poll-window: 2m
-poll-candidates: 3
 
 events:
   - demo

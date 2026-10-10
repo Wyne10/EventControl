@@ -2,7 +2,6 @@ package me.wyne.eventcontrol.api.event;
 
 import me.wyne.eventcontrol.api.queue.QueueSlot;
 import me.wyne.eventcontrol.api.queue.QueueView;
-import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -17,8 +16,6 @@ public interface PrepareContext {
     @NotNull QueueView getQueue();
 
     @NotNull QueueSlot getSlot();
-
-    @NotNull World getWorld();
 
     /** When the prepared event is scheduled to start. */
     @NotNull Instant getStartAt();

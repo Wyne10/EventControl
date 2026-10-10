@@ -17,7 +17,6 @@ import me.wyne.wutils.common.scheduler.Schedulers
 import me.wyne.wutils.common.scheduler.Task
 import me.wyne.wutils.common.terminable.Terminable
 import org.bukkit.Bukkit
-import org.bukkit.World
 import org.bukkit.event.Event
 import java.time.Duration
 import java.time.Instant
@@ -71,10 +70,6 @@ class EventQueue(
 
     override fun getKey(): String = definition.key
 
-    override fun getWorld(): World = requireNotNull(definition.world) {
-        "Queue '${definition.key}' targets world '${definition.worldName}', which is not loaded"
-    }
-
     override fun getInterval(): Duration = definition.interval
 
     override fun getPrepareLead(): Duration = definition.prepareLead
@@ -96,12 +91,6 @@ class EventQueue(
 
     fun start() {
         if (running) return
-        if (definition.world == null) {
-            EventControl.logger.warn(
-                "Not starting queue '{}': world '{}' is not loaded", definition.key, definition.worldName
-            )
-            return
-        }
         running = true
         // A restore may already have anchored the timeline; only a queue with
         // nothing resumed starts counting from now.
@@ -283,7 +272,7 @@ class EventQueue(
         if (now.isBefore(slot.startAt.minus(this.definition.prepareLead))) return
 
         transition(slot) { slot.markPreparing() }
-        val context = SlotPrepareContext(this, slot, world, slot.startAt)
+        val context = SlotPrepareContext(this, slot, slot.startAt)
 
         runCatching { definition.type.prepare(definition, context) }
             .onFailure { failPreparation(slot, definition, it) }
@@ -429,13 +418,11 @@ class EventQueue(
 private class SlotPrepareContext(
     private val queue: EventQueue,
     private val slot: QueueSlotImpl,
-    private val world: World,
     private val startAt: Instant
 ) : PrepareContext {
 
     override fun getQueue(): QueueView = queue
     override fun getSlot(): QueueSlot = slot
-    override fun getWorld(): World = world
     override fun getStartAt(): Instant = startAt
 
     override fun getRemainingLeadMillis(): Long =

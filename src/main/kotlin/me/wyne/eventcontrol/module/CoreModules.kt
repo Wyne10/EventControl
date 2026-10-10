@@ -3,7 +3,6 @@ package me.wyne.eventcontrol.module
 import com.google.inject.AbstractModule
 import me.wyne.eventcontrol.event.DemoEventType
 import me.wyne.eventcontrol.event.EventDefinitionProvider
-import me.wyne.eventcontrol.poll.PollService
 import me.wyne.eventcontrol.queue.QueueProvider
 import me.wyne.eventcontrol.queue.QueueService
 import me.wyne.eventcontrol.registry.EventControlProviderImpl
@@ -32,7 +31,6 @@ val EventModule: AbstractModule = CoreModule(
 
 val QueueModule: AbstractModule = CoreModule(
     BuiltInSources::class.java,
-    PollService::class.java,
     QueueProvider::class.java,
     QueueService::class.java
 )

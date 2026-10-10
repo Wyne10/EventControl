@@ -70,11 +70,6 @@ class QueueService @Inject constructor(
     }
 
     private fun build(definition: QueueDefinition) {
-        // A queue whose world is missing is a config error, not a runtime state:
-        // failing here keeps QueueView.getWorld() safe for every live queue.
-        requireNotNull(definition.world) {
-            "Queue '${definition.key}' targets world '${definition.worldName}', which is not loaded"
-        }
         val factory = requireNotNull(registries.queueSources().get(definition.sourceKey)) {
             "Queue '${definition.key}' names unknown source '${definition.sourceKey}'; " +
                 "registered sources: ${registries.queueSources().keys()}"

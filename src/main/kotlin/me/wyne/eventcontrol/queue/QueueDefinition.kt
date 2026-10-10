@@ -4,8 +4,6 @@ import me.wyne.eventcontrol.api.spi.Durations
 import me.wyne.eventcontrol.registry.isValidKey
 import me.wyne.wutils.common.kotlin.config.deep
 import me.wyne.wutils.config.configurables.attribute.GenericFactory
-import org.bukkit.Bukkit
-import org.bukkit.World
 import org.bukkit.configuration.ConfigurationSection
 import java.time.Duration
 
@@ -15,7 +13,6 @@ import java.time.Duration
  */
 data class QueueDefinition(
     val key: String,
-    val worldName: String,
     val interval: Duration,
     val prepareLead: Duration,
     val lookahead: Int,
@@ -25,10 +22,6 @@ data class QueueDefinition(
     val autoStart: Boolean,
     val resumeInterrupted: Boolean
 ) {
-
-    /** Null until the world is loaded, which on a fresh start is not immediate. */
-    val world: World?
-        get() = Bukkit.getWorld(worldName)
 
     object Factory : GenericFactory<QueueDefinition> {
 
@@ -48,7 +41,6 @@ data class QueueDefinition(
 
             return QueueDefinition(
                 key = key,
-                worldName = section.getString("world", "world")!!,
                 interval = interval,
                 prepareLead = prepareLead,
                 lookahead = lookahead,

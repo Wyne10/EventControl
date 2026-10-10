@@ -92,8 +92,7 @@ bukkit {
             children = listOf(
                 "eventcontrol.reload",
                 "eventcontrol.queue.view",
-                "eventcontrol.queue.control",
-                "eventcontrol.poll.manage"
+                "eventcontrol.queue.control"
             )
             default = BukkitPluginDescription.Permission.Default.OP
         }
@@ -106,11 +105,8 @@ bukkit {
         register("eventcontrol.queue.control") {
             description = "Allows to start, stop, skip and request events"
         }
-        register("eventcontrol.poll.manage") {
-            description = "Allows to open and close event polls"
-        }
         register("eventcontrol.event") {
-            description = "Allows to see upcoming events and vote in polls"
+            description = "Allows to see upcoming events"
             default = BukkitPluginDescription.Permission.Default.TRUE
         }
     }
